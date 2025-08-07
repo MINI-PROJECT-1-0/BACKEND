@@ -17,10 +17,12 @@ RUN apt-get update && \
     git \
     whois \
     dnsenum \
+    python3-requests \
+    python3-bs4 \
     && apt-get clean
 
 # This will install Python packages
-RUN pip3 install requests bs4
+#RUN pip3 install requests bs4
 
 # This create directory structure
 RUN mkdir -p /scripts /reports /wordlists
