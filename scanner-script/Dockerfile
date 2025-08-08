@@ -28,7 +28,7 @@ RUN apt-get update && \
 RUN mkdir -p /scripts /reports /wordlists
 
 # This add common wordlist
-RUN cp /usr/share/wordlists/dirb/common.txt /wordlists/
+RUN cp /usr/share/dirb/wordlists/common.txt /wordlists/
 
 # This create all scripts in /scripts directory
 RUN mkdir -p /scripts && \
