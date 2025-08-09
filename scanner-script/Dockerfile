@@ -1,7 +1,7 @@
 # Optimized Kali-based Penetration Testing Toolkit
 FROM kalilinux/kali-rolling
 
-LABEL maintainer="williams@example.com" \
+LABEL maintainer="Williams Adusei (swiftwilliams@gmail.com)" \
       version="2025.08" \
       description="Optimized Kali-based Penetration Testing Toolkit"
 
