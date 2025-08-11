@@ -21,11 +21,11 @@ RUN mkdir -p /scripts /reports /wordlists
 
 # 3) Download wordlists with failure checks
 RUN wget -q -O /wordlists/common.txt \
-      https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt || exit 1 && \
-    wget -q -O /wordlists/directory-list-2.3-medium.txt \
-      https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt || exit 1 && \
-    wget -q -O /wordlists/xss-payloads.txt \
-      https://raw.githubusercontent.com/payloadbox/xss-payload-list/master/Intruder/xss-payload-list.txt || exit 1
+      https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/common.txt
+RUN wget -q -O /wordlists/directory-list-2.3-medium.txt \
+      https://raw.githubusercontent.com/danielmiessler/SecLists/master/Discovery/Web-Content/directory-list-2.3-medium.txt
+RUN wget -q -O /wordlists/xss-payloads.txt \
+      https://raw.githubusercontent.com/payloadbox/xss-payload-list/master/Intruder/xss-payload-list.txt
 
 # 4) Install and fix line endings on all embedded scripts
 
