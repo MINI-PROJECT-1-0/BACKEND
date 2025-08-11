@@ -10,8 +10,9 @@ RUN set -euo pipefail && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       nmap nikto sqlmap dirb gobuster \
-      python3 python3-pip python3-requests python3-beautifulsoup4 whois dnsrecon \
+      python3 python3-pip whois dnsrecon \
       wget dos2unix && \
+    pip3 install --break-system-packages --no-cache-dir requests beautifulsoup4 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
