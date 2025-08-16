@@ -9,25 +9,25 @@ LABEL maintainer="red-team@example.com" \
 RUN set -euo pipefail && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    git jq dos2unix python3-pip python3-venv\
     metasploit-framework exploitdb bloodhound \
     crackmapexec powersploit impacket-scripts \
     nuclei eyewitness wafw00f cloudmapper \
-    golang nodejs npm python3.11-venv \
-    playwright chromium firefox-esr \
+    golang nodejs npm\
     awscli gcloud-sdk azure-cli \
     amass subfinder naabu httpx && \
-    pip3 install --no-cache-dir \
+    apt-get clean && rm -rf /var/lib/apt/lists/* \
+
+RUN  pip3 install --break-system-packages --no-cache-dir \
     mitm6 dnspython xsshunter \
     commix sqlmap bs4 requests \
     playwright-stealth pwntools && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    python3 -m playwright install --with-deps chromium firefox
 
 # 2. Install specialized security tools
-RUN git clone --depth 1 https://github.com/danielmiessler/SecLists /usr/share/seclists && \
-    git clone --depth 1 https://github.com/projectdiscovery/nuclei-templates /root/nuclei-templates
-&& \
-    git clone --depth 1 https://github.com/swisskyrepo/PayloadsAllTheThings
-/opt/payloads-all-the-things && \
+RUN git clone --depth 1 https://github.com/danielmiessler/SecLists.git /usr/share/seclists && \
+    git clone --depth 1 https://github.com/projectdiscovery/nuclei-templates.git /root/nuclei-templates && \
+    git clone --depth 1 https://github.com/swisskyrepo/PayloadsAllTheThings.git /opt/payloads-all-the-things && \
     go install -v github.com/projectdiscovery/katana/cmd/katana@latest && \
     go install -v github.com/projectdiscovery/notify/cmd/notify@latest && \
     go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest && \
