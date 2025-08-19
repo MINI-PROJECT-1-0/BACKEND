@@ -13,22 +13,29 @@ RUN set -euo pipefail && \
     crackmapexec powersploit impacket-scripts \
     nuclei eyewitness wafw00f cloudmapper \
     golang nodejs npm python3.11-venv \
-git\
-jq\
-dos2unix \
+    git \
+    jq \
+    dos2unix \
     playwright chromium firefox-esr \
-  libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
-  libdrm2 libxkbcommon0 libatspi2.0-0 libxcomposite1 libxdamage1 \
-  libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 \
-  libasound2 libxshmfence1 libx11-xcb1 libxcursor1 \
-  fonts-liberation libappindicator3-1 libxss1 \
-  ffmpeg\
-    awscli gcloud-sdk azure-cli \
+    libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+    libdrm2 libxkbcommon0 libatspi2.0-0 libxcomposite1 libxdamage1 \
+    libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 \
+    libasound2 libxshmfence1 libx11-xcb1 libxcursor1 \
+    fonts-liberation libappindicator3-1 libxss1 \
+    ffmpeg \
+    awscli google-cloud-sdk azure-cli \
     amass subfinder naabu httpx && \
     pip3 install --break-system-packages --no-cache-dir \
-    mitm6 dnspython xsshunter \
-    commix sqlmap bs4 requests \
-    playwright-stealth pwntools && \
+    mitm6 dnspython \
+    bs4 requests \
+    python-pwntools && \
+    # Install sqlmap from GitHub
+    git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git /opt/sqlmap && \
+    ln -s /opt/sqlmap/sqlmap.py /usr/local/bin/sqlmap && \
+    # Install playwright-stealth from correct package
+    pip3 install --break-system-packages playwright-stealth && \
+    # Install xsshunter from GitHub
+    git clone --depth 1 https://github.com/mandatoryprogrammer/xsshunter /opt/xsshunter && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Install specialized security tools
